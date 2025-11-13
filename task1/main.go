@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 )
 
 func main() {
@@ -21,9 +22,96 @@ func main() {
 	// fmt.Println(longestCommonPrefix(strArr))
 
 	// 最大数+1
-	numArr := []int{4, 3, 2, 1}
-	fmt.Println(plusOne(numArr))
+	// numArr := []int{4, 3, 2, 1}
+	// fmt.Println(plusOne(numArr))
 
+	//6、删除有序数组中的重复项
+	//  nums := []int{0, 0, 1, 1, 1, 2, 2, 3, 3, 4}
+	//  size := removeDuplicates(nums)
+	//  fmt.Println(size)
+
+	//合并
+	// arr := [][]int{
+	// 	{4, 5},
+	// 	{1, 4},
+	// }
+	// merged := merge(arr)
+	// fmt.Println(merged)
+
+	// 两数之和
+	target := 6
+	nums := []int{3, 2, 4}
+	res := sum(nums, target)
+	fmt.Println(res)
+
+}
+
+// 两数之和
+func sum(nums []int, target int) []int {
+	mp := make(map[int]int, len(nums))
+
+	for i, v := range nums {
+		mp[v] = i + 1
+	}
+	fmt.Println(mp)
+	arr := []int{}
+	for i, v := range nums {
+		a := mp[target-v]
+		if a != 0 && i != a-1 {
+			arr = append(arr, i)
+			arr = append(arr, a-1)
+			break
+		}
+	}
+	return arr
+}
+
+// 合并
+func merge(intervals [][]int) [][]int {
+	if len(intervals) == 0 {
+		return intervals
+	}
+	// 先按区间起始位置排序
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][0] < intervals[j][0]
+	})
+
+	// 初始化结果切片，放入第一个区间
+	merged := [][]int{intervals[0]}
+
+	for _, current := range intervals[1:] {
+		// 获取结果中最后一个区间
+		last := merged[len(merged)-1]
+		// 如果当前区间的起始位置小于等于结果中最后区间的结束位置，说明有重叠
+		if current[0] <= last[1] {
+			// 合并区间：更新结果中最后区间的结束位置为两者较大值
+			if current[1] > last[1] {
+				last[1] = current[1]
+			}
+		} else {
+			// 没有重叠直接添加进新切片中
+			merged = append(merged, current)
+		}
+	}
+
+	return merged
+}
+
+// 删除有序数组中的重复项
+func removeDuplicates(nums []int) int {
+	if len(nums) == 0 {
+		return 0
+	}
+
+	//不重复元素的位置
+	i := 0
+	for j := 1; j < len(nums); j++ {
+		if nums[i] != nums[j] {
+			i++
+			nums[i] = nums[j]
+		}
+	}
+	return i + 1
 }
 
 // 最大数+1
