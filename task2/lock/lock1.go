@@ -7,7 +7,7 @@ import (
 
 func main() {
 	//锁
-	lock := sync.Mutex{}
+	lock := sync.Mute{}
 	var wg sync.WaitGroup
 	count := 0
 	wg.Add(10)
