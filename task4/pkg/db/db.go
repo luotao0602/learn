@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"task4/internal/config"
+	"task4/internal/model"
+	"task4/pkg/log"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -21,7 +23,7 @@ func InitDB() {
 	stringbuilder.WriteString(cf.MySQL.Host)
 	stringbuilder.WriteString(":")
 	stringbuilder.WriteString(cf.MySQL.Port)
-	stringbuilder.WriteString(")/lt?charset=utf8mb4&parseTime=True&loc=Local")
+	stringbuilder.WriteString(")/gorm?charset=utf8mb4&parseTime=True&loc=Local")
 	url := stringbuilder.String()
 	var err error
 	MySQLDB, err = gorm.Open(mysql.Open(url), &gorm.Config{})
@@ -29,4 +31,14 @@ func InitDB() {
 		fmt.Println("connect db failed,err: %v", err)
 		panic("connect DB failed")
 	}
+}
+
+func CreateTable() {
+	if err := MySQLDB.Debug().AutoMigrate(&model.User{}, &model.Post{}, &model.Comment{}); err != nil {
+		log.Logger.Error("CreateTable error")
+		panic(err)
+	}
+
+	log.Logger.Info("CreateTable success")
+
 }
