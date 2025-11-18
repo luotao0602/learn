@@ -29,14 +29,12 @@ func InitDB() {
 	MySQLDB, err = gorm.Open(mysql.Open(url), &gorm.Config{})
 	if err != nil {
 		fmt.Println("connect db failed,err: %v", err)
-		panic("connect DB failed")
 	}
 }
 
 func CreateTable() {
 	if err := MySQLDB.Debug().AutoMigrate(&model.User{}, &model.Post{}, &model.Comment{}); err != nil {
 		log.Logger.Error("CreateTable error")
-		panic(err)
 	}
 
 	log.Logger.Info("CreateTable success")

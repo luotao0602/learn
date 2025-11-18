@@ -1,6 +1,7 @@
 package router
 
 import (
+	"task4/internal/middleware"
 	"task4/pkg/log"
 
 	"github.com/gin-gonic/gin"
@@ -31,4 +32,7 @@ func InitRouter() {
 	     适用场景：需要自定义中间件组合时（比如替换日志格式、添加权限校验中间件等）
 	*/
 	r.Use(gin.Recovery()) // 核心的崩溃恢复中间件
+	// 新增自定义中间件
+	r.Use(middleware.GlobleErrorHandlerMiddleWare(), middleware.LoggerMiddleWare())
+
 }
