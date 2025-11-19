@@ -23,5 +23,5 @@ func main() {
 	db.CreateTable()
 	log.Logger.Info("DB初始化成功")
 	// 初始化路由
-	router.StartService()
+	router.InitRouter()
 }

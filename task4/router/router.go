@@ -1,26 +1,12 @@
 package router
 
 import (
+	"task4/internal/handler"
 	"task4/internal/middleware"
 	"task4/pkg/log"
 
 	"github.com/gin-gonic/gin"
 )
-
-func StartService() *gin.Engine {
-	InitRouter()
-
-	r := gin.Default()
-	r.GET("/test", func(c *gin.Context) {
-		c.String(200, "hello world")
-	})
-
-	err := r.Run(":8080")
-	if err != nil {
-		log.Logger.Error("service start failed")
-	}
-	log.Logger.Info("service start success")
-}
 
 func InitRouter() {
 	gin.SetMode(gin.DebugMode)
@@ -34,5 +20,24 @@ func InitRouter() {
 	r.Use(gin.Recovery()) // 核心的崩溃恢复中间件
 	// 新增自定义中间件
 	r.Use(middleware.GlobleErrorHandlerMiddleWare(), middleware.LoggerMiddleWare())
+	// 路由
 
+	apiV1 := r.Group("/api/v1")
+	{
+		auth := apiV1.Group("/auth")
+		{
+			// 这里的 handler.Register 是作为一个「函数值」（可以理解为 “函数的引用”）传递给 Gin，而非执行它。
+			// 此时不需要传参，因为：
+			// 函数还没被执行，只是告诉框架 “要执行哪个函数”；
+			// 当请求真正到来时，Gin 会自动创建 *gin.Context 实例（封装了请求信息、响应工具等），
+			// 然后调用 handler.Register(c)，把上下文参数 c 注入进去。
+			auth.POST("/register/", handler.Register)
+		}
+	}
+
+	err := r.Run(":8080")
+	if err != nil {
+		log.Logger.Error("service start failed")
+	}
+	log.Logger.Info("service start success")
 }
