@@ -1,19 +1,31 @@
 package middleware
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
-// 自定义全局异常处理中间件，加入到 r.Use()中
+// LoggerMiddleware 日志记录中间件
 func LoggerMiddleWare() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		startTime := time.Now()
-		// 跳至下一个中间件执行，完后再回溯处理c.Next()之后的业务代码
-		c.Next()
-		dealTime := time.Since(startTime)
-		fmt.Sprintf("请求耗费时长: %v", dealTime)
-	}
+	// 创建logrus实例
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.JSONFormatter{})
+
+	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		// 记录请求日志
+		logger.WithFields(logrus.Fields{
+			"status_code": param.StatusCode,
+			"latency":     param.Latency,
+			"client_ip":   param.ClientIP,
+			"method":      param.Method,
+			"path":        param.Path,
+			"user_agent":  param.Request.UserAgent(),
+			"error":       param.ErrorMessage,
+			"timestamp":   param.TimeStamp.Format(time.RFC3339),
+		}).Info("HTTP Request")
+
+		return ""
+	})
 }

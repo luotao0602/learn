@@ -5,8 +5,8 @@ import (
 	"strings"
 	"task4/internal/config"
 	"task4/internal/model"
-	"task4/pkg/log"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -34,9 +34,13 @@ func InitDB() {
 
 func CreateTable() {
 	if err := MySQLDB.Debug().AutoMigrate(&model.User{}, &model.Post{}, &model.Comment{}); err != nil {
-		log.Logger.Error("CreateTable error")
+		logrus.Error("CreateTable error")
 	}
 
-	log.Logger.Info("CreateTable success")
+	logrus.Info("CreateTable success")
 
+}
+
+func GetGormDB() *gorm.DB {
+	return MySQLDB
 }

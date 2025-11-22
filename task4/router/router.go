@@ -1,14 +1,13 @@
 package router
 
 import (
-	"task4/internal/handler"
+	"task4/internal/controller"
 	"task4/internal/middleware"
-	"task4/pkg/log"
 
 	"github.com/gin-gonic/gin"
 )
 
-func InitRouter() {
+func InitRouter() *gin.Engine {
 	gin.SetMode(gin.DebugMode)
 	r := gin.New() // 创建纯净的 Gin 引擎
 	/**
@@ -21,7 +20,8 @@ func InitRouter() {
 	// 新增自定义中间件
 	r.Use(middleware.GlobleErrorHandlerMiddleWare(), middleware.LoggerMiddleWare())
 	// 路由
-
+	// 创建控制器实例
+	authController := &controller.AuthController{}
 	apiV1 := r.Group("/api/v1")
 	{
 		auth := apiV1.Group("/auth")
@@ -31,13 +31,9 @@ func InitRouter() {
 			// 函数还没被执行，只是告诉框架 “要执行哪个函数”；
 			// 当请求真正到来时，Gin 会自动创建 *gin.Context 实例（封装了请求信息、响应工具等），
 			// 然后调用 handler.Register(c)，把上下文参数 c 注入进去。
-			auth.POST("/register/", handler.Register)
+			auth.POST("/register/", authController.Register)
+			auth.POST("/login/", authController.Login)
 		}
 	}
-
-	err := r.Run(":8080")
-	if err != nil {
-		log.Logger.Error("service start failed")
-	}
-	log.Logger.Info("service start success")
+	return r
 }
