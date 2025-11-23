@@ -14,4 +14,8 @@ type Post struct {
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+
+	// 关联关系  Preload 预加载  foreignkey关联外键
+	User    User      `json:"user,omitempty" gorm:"foreignkey:UserID"`
+	Comment []Comment `json:"comments,omitempty" gorm:"foreignkey:PostID"`
 }

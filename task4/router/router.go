@@ -17,11 +17,15 @@ func InitRouter() *gin.Engine {
 	     适用场景：需要自定义中间件组合时（比如替换日志格式、添加权限校验中间件等）
 	*/
 	r.Use(gin.Recovery()) // 核心的崩溃恢复中间件
+
 	// 新增自定义中间件
 	r.Use(middleware.GlobleErrorHandlerMiddleWare(), middleware.LoggerMiddleWare())
+
 	// 路由
 	// 创建控制器实例
 	authController := &controller.AuthController{}
+	userController := &controller.UserController{}
+	postController := &controller.PostController{}
 	apiV1 := r.Group("/api/v1")
 	{
 		auth := apiV1.Group("/auth")
@@ -33,6 +37,20 @@ func InitRouter() *gin.Engine {
 			// 然后调用 handler.Register(c)，把上下文参数 c 注入进去。
 			auth.POST("/register/", authController.Register)
 			auth.POST("/login/", authController.Login)
+		}
+
+		// 需要认证的路由
+		authenticated := apiV1.Group("")
+		authenticated.Use(middleware.AuthMiddleWare())
+		{
+			// 用户信息
+			authenticated.GET("/userInfo", userController.GetUserInfo)
+		}
+		// 文章相关路由
+		posts := authenticated.Group("/post")
+		{
+			posts.POST("/create/", postController.CreatePost)
+			posts.GET("/query/", postController.QueryPostList)
 		}
 	}
 	return r

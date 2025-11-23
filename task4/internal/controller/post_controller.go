@@ -9,18 +9,18 @@ import (
 )
 
 // 定义请求
-type AuthController struct{}
+type PostController struct{}
 
 // var AuthController = new(authController)
-func (ct *AuthController) Register(c *gin.Context) {
-	req := &dto.RegisterRequest{}
+func (pt *PostController) CreatePost(c *gin.Context) {
+	req := &dto.PostRequest{}
 	// 参数校验
 	if err := c.ShouldBindJSON(req); err != nil {
 		response.BadRequest(c, "参数校验失败")
 		return
 	}
 	// service层
-	if error := service.UserService.Register(req); error != nil {
+	if error := service.PostService.CreatePost(req, c); error != nil {
 		response.InternalServerError(c, error.Error())
 		return
 	}
@@ -28,17 +28,10 @@ func (ct *AuthController) Register(c *gin.Context) {
 	response.Success(c, "success")
 }
 
-func (ct *AuthController) Login(c *gin.Context) {
-	var loginReq dto.LoginRequest
-	if err := c.ShouldBindJSON(&loginReq); err != nil {
-		response.BadRequest(c, "参数校验失败")
-		return
-	}
+func (pt *PostController) QueryPostList(c *gin.Context) {
 	// service层
-	if authResponse, error := service.UserService.Login(&loginReq); error != nil {
+	if error := service.PostService.QueryPostList(c); error != nil {
 		response.InternalServerError(c, error.Error())
 		return
-	} else {
-		response.Success(c, authResponse)
 	}
 }

@@ -9,10 +9,10 @@ import (
 )
 
 // 定义请求
-type AuthController struct{}
+type UserController struct{}
 
 // var AuthController = new(authController)
-func (ct *AuthController) Register(c *gin.Context) {
+func (uc *UserController) GetUserInfo(c *gin.Context) {
 	req := &dto.RegisterRequest{}
 	// 参数校验
 	if err := c.ShouldBindJSON(req); err != nil {
@@ -26,19 +26,4 @@ func (ct *AuthController) Register(c *gin.Context) {
 	}
 
 	response.Success(c, "success")
-}
-
-func (ct *AuthController) Login(c *gin.Context) {
-	var loginReq dto.LoginRequest
-	if err := c.ShouldBindJSON(&loginReq); err != nil {
-		response.BadRequest(c, "参数校验失败")
-		return
-	}
-	// service层
-	if authResponse, error := service.UserService.Login(&loginReq); error != nil {
-		response.InternalServerError(c, error.Error())
-		return
-	} else {
-		response.Success(c, authResponse)
-	}
 }

@@ -5,6 +5,7 @@ import (
 	"task4/internal/model"
 	"task4/pkg/db"
 	"task4/pkg/exception"
+	"task4/pkg/utils"
 )
 
 // 定义结构体
@@ -38,15 +39,24 @@ func (user *userService) Register(req *dto.RegisterRequest) error {
 	return nil
 }
 
-func (user *userService) Login(loginReq *dto.LoginRequest) error {
+func (user *userService) Login(loginReq *dto.LoginRequest) (dto.AuthResponse, error) {
 	db := db.GetGormDB()
-	existUser := &model.User{}
-	if err := db.Where("username = ?", loginReq.Username).First(existUser); err != nil {
-		return exception.NewSystemException(err.Error.Error())
+	var existUser model.User
+	if err := db.Where("username = ?", loginReq.Username).First(&existUser).Error; err != nil {
+		return dto.AuthResponse{}, exception.NewSystemException(err.Error())
 	}
 	if !existUser.CheckPassword(loginReq.Password) {
-		return exception.NewSystemException("password is not right")
+		return dto.AuthResponse{}, exception.NewSystemException("Invalid username or password")
 	}
-	// TODO
-	return nil
+
+	// 生成JWT token
+	token, err := utils.GenerateToken(existUser.ID, existUser.Username)
+	if err != nil {
+		return dto.AuthResponse{}, exception.NewSystemException("Failed to generate token")
+	}
+
+	return dto.AuthResponse{
+		Token: token,
+		User:  existUser,
+	}, nil
 }
