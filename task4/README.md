@@ -77,6 +77,7 @@ content (内容)
 user_id (外键，关联users表)
 created_at, updated_at, deleted_at
 
+
 Comments表
 id (主键)
 content (内容)
