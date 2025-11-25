@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"strings"
 	"task4/internal/config"
 	"task4/internal/model"
@@ -28,7 +27,7 @@ func InitDB() {
 	var err error
 	MySQLDB, err = gorm.Open(mysql.Open(url), &gorm.Config{})
 	if err != nil {
-		fmt.Println("connect db failed,err: %v", err)
+		logrus.Error("connect db failed,err: %v", err)
 	}
 }
 

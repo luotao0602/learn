@@ -35,3 +35,27 @@ func (pt *PostController) QueryPostList(c *gin.Context) {
 		return
 	}
 }
+
+func (pt *PostController) QueryPostDetail(c *gin.Context) {
+	// service层
+	if error := service.PostService.QueryPostDetail(c); error != nil {
+		response.InternalServerError(c, error.Error())
+		return
+	}
+}
+
+func (pt *PostController) UpdatePost(c *gin.Context) {
+	req := &dto.PostRequest{}
+	// 参数校验
+	if err := c.ShouldBindJSON(req); err != nil {
+		response.BadRequest(c, "参数校验失败")
+		return
+	}
+	// service层
+	if error := service.PostService.UpdatePost(req, c); error != nil {
+		response.InternalServerError(c, error.Error())
+		return
+	}
+
+	response.Success(c, "success")
+}

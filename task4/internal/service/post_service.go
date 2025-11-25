@@ -77,3 +77,47 @@ func (pt *postService) QueryPostList(c *gin.Context) error {
 	})
 	return nil
 }
+
+// 获取文章详情
+func (pt *postService) QueryPostDetail(c *gin.Context) error {
+	var post model.Post
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		response.Error(c, 400, err.Error())
+	}
+
+	if error := db.GetGormDB().Debug().Preload("User").
+		Where("id = ?", id).
+		Find(&post).Error; error != nil {
+		return exception.NewSystemException(error.Error())
+	}
+
+	response.Success(c, post)
+	return nil
+}
+
+// 更新文章
+func (pt *postService) UpdatePost(req *dto.PostRequest, c *gin.Context) error {
+	// 获取上下文的user信息
+	userId, exsit := c.Get("user_id")
+	if !exsit {
+		return exception.NewSystemException("User not authenticated")
+	}
+	db := db.GetGormDB()
+	var post model.Post
+	if err := db.First(&post, req.ID).Error; err != nil {
+		return exception.NewSystemException("Post not found")
+
+	}
+	// 检查是否是文章作者
+	if post.UserID != userId.(uint) {
+		return exception.NewSystemException("You can only update your own posts")
+	}
+
+	post.Title = req.Title
+	post.Content = req.Content
+	if error := db.Debug().Save(&post).Error; error != nil {
+		return exception.NewSystemException(error.Error())
+	}
+	return nil
+}

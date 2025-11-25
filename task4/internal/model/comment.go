@@ -14,4 +14,7 @@ type Comment struct {
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+
+	User User `json:"user,omitempty" gorm:"foreignkey:UserID"`
+	// Post Post `json:"post,omitempty" gorm:"foreignkey:PostID"`
 }

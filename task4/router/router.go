@@ -26,6 +26,7 @@ func InitRouter() *gin.Engine {
 	authController := &controller.AuthController{}
 	userController := &controller.UserController{}
 	postController := &controller.PostController{}
+	commentController := &controller.CommentController{}
 	apiV1 := r.Group("/api/v1")
 	{
 		auth := apiV1.Group("/auth")
@@ -50,7 +51,22 @@ func InitRouter() *gin.Engine {
 		posts := authenticated.Group("/post")
 		{
 			posts.POST("/create/", postController.CreatePost)
-			posts.GET("/query/", postController.QueryPostList)
+			posts.PUT("/update/", postController.UpdatePost)
+		}
+
+		// 评论相关路由
+		comment := authenticated.Group("/comment")
+		{
+			comment.POST("/create/", commentController.CreateComment)
+
+		}
+
+		// 文章、评论，不需要鉴权
+		public := apiV1.Group("")
+		{
+			public.GET("/post/query/", postController.QueryPostList)
+			public.GET("/post/query_detail/:id", postController.QueryPostDetail)
+			public.GET("/comment/query/:post_id", commentController.QueryComment)
 		}
 	}
 	return r
