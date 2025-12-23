@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.26;
+contract Voting{
+    mapping(string => uint) public votes;
+    //候选人列表
+    string[] public candidates;
+
+    // 存在性检查（⽤于校验输入的候选人是否存在）
+    mapping(string => bool) public isUser;
+
+    //添加候选人
+    function addCandidates(string memory username) public {
+        require(bytes(username).length > 0, " username is empty");
+        if(!isUser[username]){
+            candidates.push(username);
+            isUser[username] = true;
+        }
+    }
+
+    //根据候选人名称投票 +1
+    function vote(string memory username) public {
+        require(bytes(username).length > 0, "username is empty");
+        require(isUser[username],"candidates is not exist");
+        votes[username] = votes[username] +1;
+    }
+
+    //获取候选人票数
+    function getVotes(string memory username) public view returns (uint) {
+        return  votes[username];
+    }
+
+    // 重置候选人分数
+    function resetVotes() public{
+        for (uint256 i = 0; i < candidates.length; i++){
+            delete votes[candidates[i]];
+        }
+    }
+
+}
