@@ -36,4 +36,112 @@ contract Voting{
         }
     }
 
+
+    /**
+    字符串反转
+    **/
+    function stringReverser(string calldata str) public pure returns (string memory) {
+        bytes memory bytesArr = bytes(str);
+        uint256 length = bytesArr.length;
+        if (length == 0) {
+            return str;
+        }
+        // 双指针交换字符
+        for(uint256 i = 0; i < length / 2 ; i++){
+            bytes1 temp = bytesArr[i];
+            bytesArr[i] = bytesArr[length-1-i];
+            bytesArr[length-1-i] = temp;
+        }
+        return string(bytesArr);
+    } 
+
+
+
+    /**
+     * 罗马数字转整数
+     */
+    function romanToInt(string calldata roman) public pure returns (uint16 num) {
+        require(bytes(roman).length > 0, "Roman string cannot be empty");
+        
+        bytes memory romanBytes = bytes(roman);
+        uint256 length = romanBytes.length;
+
+        // 遍历每个字符，计算数值
+        for (uint256 i = 0; i < length; i++) {
+            uint16 current = getValue(romanBytes[i]);
+            // 校验非法字符
+            require(current > 0, "Invalid Roman character");
+
+            // 如果不是最后一个字符，且当前值 < 下一个值 → 减去当前值
+            if (i < length - 1) {
+                uint16 next = getValue(romanBytes[i+1]);
+                if (current < next) {
+                    num -= current;
+                    continue;
+                }
+            }
+            // 否则加上当前值
+            num += current;
+        }
+    }
+
+    /**
+     *根据罗马字符返回对应数值
+     */
+    function getValue(bytes1 c) private pure returns (uint16) {
+        if (c == bytes1('I')) return 1;
+        if (c == bytes1('V')) return 5;
+        if (c == bytes1('X')) return 10;
+        if (c == bytes1('L')) return 50;
+        if (c == bytes1('C')) return 100;
+        if (c == bytes1('D')) return 500;
+        if (c == bytes1('M')) return 1000;
+        // 非法字符返回 0
+        return 0;
+    }
+
+
+    function intToRoman(uint16 num) public pure returns (string memory roman) {
+    
+        // 2. 定义数值-罗马符号映射表（含减法形式，按数值从大到小排列）
+        (uint16[] memory values, string[] memory symbols) = getRomanRules();
+        
+        // 3. 初始化字节数组用于拼接结果（比直接拼string更省gas）
+        bytes memory result = new bytes(0);
+        uint16 remaining = num;
+
+        // 4. 贪心算法遍历映射表
+        for (uint256 i = 0; i < values.length; i++) {
+            // 重复拼接当前符号，直到剩余数值 < 映射值
+            while (remaining >= values[i]) {
+                result = abi.encodePacked(result, bytes(symbols[i]));
+                remaining -= values[i];
+            }
+            // 剩余数值为0时提前退出
+            if (remaining == 0) break;
+        }
+
+        // 5. 字节数组转字符串返回
+        roman = string(result);
+    }
+    /**
+     获取罗马数字与字符的映射关系
+     */
+    function getRomanRules() private pure returns (uint16[] memory values, string[] memory symbols) {
+        // 初始化数组长度（组映射）
+        values = new uint16[](7);
+        symbols = new string[](7);
+
+        // 按数值从大到小赋值
+        values[0] = 1000; symbols[0] = "M";
+        values[1] = 500;  symbols[1] = "D";
+        values[2] = 100;  symbols[2] = "C";
+        values[3] = 50;   symbols[3] = "L";
+        values[4] = 10;   symbols[4] = "X";
+        values[5] = 5;   symbols[5] = "V";
+        values[6] = 1;   symbols[6] = "I";
+    }
+
+
+
 }
