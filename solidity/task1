@@ -142,6 +142,48 @@ contract Voting{
         values[6] = 1;   symbols[6] = "I";
     }
 
+        //合并两个有序数组 (Merge Sorted Array)
+    function mergeArray(uint256[] memory a, uint256[] memory b) public pure returns (uint256[] memory){
+        uint256[] memory mergeArr = new uint256[](a.length+b.length);
+        uint256 i = 0;
+        uint256 j = 0;
+        uint256 k = 0;
+        for (; i<a.length && j<b.length; )
+        {
+            mergeArr[k++] = (a[i] <= b[j]) ? a[i++] : b[j++];
+        }
+        // 处理 a 中剩余元素
+        while (i < a.length) {
+            mergeArr[k++] = a[i++];
+        }
 
+        // 处理 b 中剩余元素
+        while (j < b.length) {
+            mergeArr[k++] = b[j++];
+        }
+
+        return mergeArr;
+    }
+
+    // 二分查找 (Binary Search)
+    function binarySearch(uint256[] memory arr, uint256 point) public pure returns (int256){
+        if(arr.length==0){
+            return -1;
+        }
+        uint256 left =0;
+        uint256 right = arr.length-1;
+        while(left<=right){
+            uint256 mid = (left+right)/2;
+            if(arr[mid] == point){
+                return int256(mid);
+            }
+            if(arr[mid] < point){
+                left = mid+1;
+            }else{
+                right = mid-1;
+            }
+        }
+        return -1;
+    }
 
 }
